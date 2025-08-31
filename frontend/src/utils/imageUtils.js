@@ -1,22 +1,14 @@
 export function getImageUrl(imagePath) {
-  console.log('getImageUrl called with:', imagePath);
-  
-  if (!imagePath) {
-    console.log('No imagePath provided, returning empty string');
+  if (!imagePath)
     return ''
-  }
   
   // If it's already a full URL (Cloudinary or other CDN), return as-is
-  if (imagePath.startsWith('http')) {
-    console.log('Image is already a full URL, returning as-is:', imagePath);
+  if (imagePath.startsWith('http'))
     return imagePath
-  }
 
   // For legacy local images, construct the full URL
   const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000'
-  const finalUrl = imagePath.startsWith('/') ? `${baseUrl}${imagePath}` : `${baseUrl}/${imagePath}`
-  console.log('Constructed URL:', finalUrl);
-  return finalUrl
+  return imagePath.startsWith('/') ? `${baseUrl}${imagePath}` : `${baseUrl}/${imagePath}`
 }
 
 export function getImageUrls(imagePaths) {
