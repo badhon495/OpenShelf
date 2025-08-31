@@ -40,3 +40,4 @@ class Item(models.Model):
 
     class Meta:
         db_table = 'items'
+        ordering = ['-id']  # Order by ID in descending order to fix pagination warning
