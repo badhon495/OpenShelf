@@ -221,10 +221,38 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5176",
 ]
 
-# Add production frontend URL
+# Add multiple production frontend URLs
+# Method 1: Using multiple environment variables
 FRONTEND_URL = os.environ.get('FRONTEND_URL')
 if FRONTEND_URL:
     CORS_ALLOWED_ORIGINS.append(FRONTEND_URL)
+    print(f"Added CORS origin from FRONTEND_URL: {FRONTEND_URL}")  # Debug output
+
+# Add additional frontend URLs (for multiple deployments)
+FRONTEND_URL_2 = os.environ.get('FRONTEND_URL_2')
+if FRONTEND_URL_2:
+    CORS_ALLOWED_ORIGINS.append(FRONTEND_URL_2)
+    print(f"Added CORS origin from FRONTEND_URL_2: {FRONTEND_URL_2}")  # Debug output
+
+FRONTEND_URL_3 = os.environ.get('FRONTEND_URL_3')
+if FRONTEND_URL_3:
+    CORS_ALLOWED_ORIGINS.append(FRONTEND_URL_3)
+    print(f"Added CORS origin from FRONTEND_URL_3: {FRONTEND_URL_3}")  # Debug output
+
+# Method 2: Using comma-separated URLs in a single environment variable
+FRONTEND_URLS = os.environ.get('FRONTEND_URLS')
+if FRONTEND_URLS:
+    # Split by comma, strip whitespace, and filter out empty strings
+    urls = [url.strip() for url in FRONTEND_URLS.split(',') if url.strip()]
+    # Validate URLs don't have paths
+    valid_urls = []
+    for url in urls:
+        if url and not url.endswith('/') and '/' not in url.split('://')[1] if '://' in url else True:
+            valid_urls.append(url)
+        else:
+            print(f"Skipping invalid CORS origin: {url}")
+    CORS_ALLOWED_ORIGINS.extend(valid_urls)
+    print(f"Added CORS origins from FRONTEND_URLS: {valid_urls}")  # Debug output
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = False
@@ -267,8 +295,25 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 # Add production URLs to CSRF trusted origins
+# Add individual frontend URLs
 if FRONTEND_URL:
     CSRF_TRUSTED_ORIGINS.append(FRONTEND_URL)
+if FRONTEND_URL_2:
+    CSRF_TRUSTED_ORIGINS.append(FRONTEND_URL_2)
+if FRONTEND_URL_3:
+    CSRF_TRUSTED_ORIGINS.append(FRONTEND_URL_3)
+
+# Add comma-separated frontend URLs
+if FRONTEND_URLS:
+    urls = [url.strip() for url in FRONTEND_URLS.split(',') if url.strip()]
+    # Validate URLs for CSRF trusted origins
+    valid_urls = []
+    for url in urls:
+        if url and not url.endswith('/'):
+            valid_urls.append(url)
+    CSRF_TRUSTED_ORIGINS.extend(valid_urls)
+
+# Add backend URL
 if os.environ.get('RENDER_EXTERNAL_HOSTNAME'):
     backend_url = f"https://{os.environ.get('RENDER_EXTERNAL_HOSTNAME')}"
     CSRF_TRUSTED_ORIGINS.append(backend_url)
