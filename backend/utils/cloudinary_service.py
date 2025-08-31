@@ -41,23 +41,30 @@ class CloudinaryService:
         return signature
     
     @staticmethod
-    def upload_image(image_file, folder="openshelf"):
+    def upload_image(image_file, folder="openshelf/items"):
         """
         Upload an image to Cloudinary using REST API
         """
         try:
             config = CloudinaryService._get_cloudinary_config()
             
-            # Generate unique filename
-            unique_filename = f"{folder}_{uuid.uuid4().hex}"
+            # Check if config is valid
+            if not all([config['cloud_name'], config['api_key'], config['api_secret']]):
+                return {
+                    'success': False,
+                    'error': 'Cloudinary configuration is incomplete'
+                }
+            
             timestamp = str(int(time.time()))
             
-            # Prepare upload parameters for signature (only include params that need to be signed)
+            # Simplified approach - only sign the minimum required parameters
             params_for_signature = {
-                'folder': folder,
-                'public_id': unique_filename,
                 'timestamp': timestamp,
             }
+            
+            # Add folder only if it's not the default
+            if folder and folder != "":
+                params_for_signature['folder'] = folder
             
             # Generate signature
             signature = CloudinaryService._generate_signature(params_for_signature, config['api_secret'])
@@ -65,12 +72,14 @@ class CloudinaryService:
             # Prepare form data
             files = {'file': image_file}
             data = {
-                'folder': folder,
-                'public_id': unique_filename,
                 'timestamp': timestamp,
                 'api_key': config['api_key'],
                 'signature': signature
             }
+            
+            # Add folder to data if specified
+            if folder and folder != "":
+                data['folder'] = folder
             
             # Upload to Cloudinary
             upload_url = f"https://api.cloudinary.com/v1_1/{config['cloud_name']}/image/upload"
