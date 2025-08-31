@@ -6,7 +6,7 @@ from django.contrib.postgres.fields import ArrayField
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('items', '0002_alter_item_image_urls'),
+        ('items', '0003_alter_item_condition'),
     ]
 
     operations = [
