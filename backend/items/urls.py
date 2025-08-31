@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 from .upload_views import upload_images, delete_image, get_optimized_url
+from .test_views import test_cloudinary_config
 
 app_name = 'items'
 
@@ -10,6 +11,7 @@ urlpatterns = [
     path('upload-images/', upload_images, name='upload-images'),
     path('delete-image/', delete_image, name='delete-image'),
     path('optimize-image/', get_optimized_url, name='optimize-image'),
+    path('test-cloudinary/', test_cloudinary_config, name='test-cloudinary'),
     path('my-items/', views.MyItemsView.as_view(), name='my-items'),
     path('search/', views.search_items, name='search-items'),
     path('<uuid:pk>/', views.ItemDetailView.as_view(), name='item-detail'),

@@ -24,15 +24,18 @@ class CloudinaryService:
     @staticmethod
     def _generate_signature(params, api_secret):
         """Generate signature for Cloudinary API"""
+        # Remove api_key from params if it exists (it shouldn't be signed)
+        params_to_sign = {k: v for k, v in params.items() if k != 'api_key'}
+        
         # Sort parameters and create string
-        sorted_params = sorted(params.items())
+        sorted_params = sorted(params_to_sign.items())
         param_string = '&'.join([f"{k}={v}" for k, v in sorted_params])
         
-        # Create signature
+        # Create signature using SHA-1 (Cloudinary uses SHA-1, not SHA-256)
         signature = hmac.new(
             api_secret.encode('utf-8'),
             param_string.encode('utf-8'),
-            hashlib.sha256
+            hashlib.sha1
         ).hexdigest()
         
         return signature
@@ -49,21 +52,22 @@ class CloudinaryService:
             unique_filename = f"{folder}_{uuid.uuid4().hex}"
             timestamp = str(int(time.time()))
             
-            # Prepare upload parameters
-            params = {
+            # Prepare upload parameters for signature (only include params that need to be signed)
+            params_for_signature = {
                 'folder': folder,
                 'public_id': unique_filename,
                 'timestamp': timestamp,
-                'transformation': 'q_auto,f_auto'
             }
             
             # Generate signature
-            signature = CloudinaryService._generate_signature(params, config['api_secret'])
+            signature = CloudinaryService._generate_signature(params_for_signature, config['api_secret'])
             
             # Prepare form data
             files = {'file': image_file}
             data = {
-                **params,
+                'folder': folder,
+                'public_id': unique_filename,
+                'timestamp': timestamp,
                 'api_key': config['api_key'],
                 'signature': signature
             }

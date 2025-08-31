@@ -2,6 +2,14 @@ import { Link } from 'react-router'
 import { getImageUrl } from '../../../utils/imageUtils'
 
 export default function Item({ item }) {
+  // Debug logging
+  console.log('Item data:', item);
+  console.log('Image URLs:', item.image_urls);
+  if (item.image_urls && item.image_urls.length > 0) {
+    console.log('First image URL:', item.image_urls[0]);
+    console.log('Processed URL:', getImageUrl(item.image_urls[0]));
+  }
+
   return (
     <Link to={`/items/${item.id}`} className="flex">
       <div className="w-36 flex flex-col gap-2">
