@@ -23,20 +23,19 @@ class CloudinaryService:
     
     @staticmethod
     def _generate_signature(params, api_secret):
-        """Generate signature for Cloudinary API"""
+        """Generate signature for Cloudinary API using their official method"""
         # Remove api_key from params if it exists (it shouldn't be signed)
         params_to_sign = {k: v for k, v in params.items() if k != 'api_key'}
         
-        # Sort parameters and create string
+        # Sort parameters alphabetically and create string
         sorted_params = sorted(params_to_sign.items())
         param_string = '&'.join([f"{k}={v}" for k, v in sorted_params])
         
-        # Create signature using SHA-1 (Cloudinary uses SHA-1, not SHA-256)
-        signature = hmac.new(
-            api_secret.encode('utf-8'),
-            param_string.encode('utf-8'),
-            hashlib.sha1
-        ).hexdigest()
+        # Append API secret to the parameter string (Cloudinary's method)
+        to_sign = param_string + api_secret
+        
+        # Create SHA-1 hash (not HMAC)
+        signature = hashlib.sha1(to_sign.encode('utf-8')).hexdigest()
         
         return signature
     
