@@ -256,6 +256,7 @@ if FRONTEND_URLS:
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = False
+CORS_PREFLIGHT_MAX_AGE = 86400
 CORS_ALLOWED_HEADERS = [
     'accept',
     'accept-encoding',
@@ -266,7 +267,29 @@ CORS_ALLOWED_HEADERS = [
     'user-agent',
     'x-csrftoken',
     'x-requested-with',
+    'cache-control',
 ]
+
+CORS_EXPOSE_HEADERS = [
+    'set-cookie',
+]
+
+# Session and Cookie Configuration for Cross-Origin
+SESSION_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SECURE = True  # Requires HTTPS
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_AGE = 86400  # 24 hours
+
+CSRF_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SECURE = True  # Requires HTTPS
+CSRF_COOKIE_HTTPONLY = False  # Must be False for frontend access
+
+# For development, override secure settings
+if DEBUG:
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    CSRF_COOKIE_SAMESITE = 'Lax'
 
 # Django REST Framework Configuration
 REST_FRAMEWORK = {
