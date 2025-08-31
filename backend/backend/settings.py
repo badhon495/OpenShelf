@@ -15,6 +15,9 @@ import os
 import urllib.parse
 import dj_database_url
 from dotenv import load_dotenv
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 
 # Load environment variables
 load_dotenv()
@@ -153,6 +156,21 @@ else:
             'PORT':'5432'
         }
     }
+
+
+# Cloudinary Configuration
+cloudinary.config(
+    cloud_name=os.environ.get('CLOUDINARY_CLOUD_NAME', 'dzytspfsm'),
+    api_key=os.environ.get('CLOUDINARY_API_KEY', '974184496451473'),
+    api_secret=os.environ.get('CLOUDINARY_API_SECRET', 'dEHfbjaWaXXQJqXUIleHBUESTs0'),
+    secure=True
+)
+
+CLOUDINARY_SETTINGS = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', 'dzytspfsm'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY', '974184496451473'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', 'dEHfbjaWaXXQJqXUIleHBUESTs0'),
+}
 
 
 # Password validation

@@ -30,7 +30,15 @@ class Item(models.Model):
         models.CharField(max_length=500),
         size=10,
         default=list,
-        blank=True
+        blank=True,
+        help_text="Cloudinary image URLs"
+    )
+    cloudinary_public_ids = ArrayField(
+        models.CharField(max_length=200),
+        size=10,
+        default=list,
+        blank=True,
+        help_text="Cloudinary public IDs for image management"
     )
     number_of_items = models.PositiveIntegerField(default=1)
     is_available = models.BooleanField(default=True)

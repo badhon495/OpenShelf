@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
 from .models import Item
 from .serializers import ItemSerializer, ItemCreateSerializer, ItemListSerializer, ItemDetailSerializer
+from utils.cloudinary_service import CloudinaryService
 
 
 class ItemListView(generics.ListAPIView):
@@ -37,6 +38,15 @@ class ItemDeleteView(generics.DestroyAPIView):
     
     def get_queryset(self):
         return Item.objects.filter(owner=self.request.user)
+    
+    def perform_destroy(self, instance):
+        # Delete associated Cloudinary images before deleting the item
+        if instance.cloudinary_public_ids:
+            for public_id in instance.cloudinary_public_ids:
+                CloudinaryService.delete_image(public_id)
+        
+        # Delete the item
+        instance.delete()
 
 
 class MyItemsView(generics.ListAPIView):
