@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+import urllib.parse
 import dj_database_url
 from dotenv import load_dotenv
 
@@ -102,9 +103,45 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Use database URL for production, fallback to local development settings
 DATABASE_URL = os.environ.get('DATABASE_URL')
 if DATABASE_URL and DATABASE_URL.strip():
-    DATABASES = {
-        'default': dj_database_url.parse(DATABASE_URL)
-    }
+    try:
+        # First try with dj-database-url
+        DATABASES = {
+            'default': dj_database_url.parse(DATABASE_URL)
+        }
+    except (ValueError, Exception) as e:
+        print(f"Error parsing DATABASE_URL with dj-database-url: {e}")
+        print(f"DATABASE_URL value: '{DATABASE_URL}'")
+        
+        # Fallback: manual parsing
+        try:
+            url = urllib.parse.urlparse(DATABASE_URL)
+            DATABASES = {
+                'default': {
+                    'ENGINE': 'django.db.backends.postgresql',
+                    'NAME': url.path[1:],  # Remove leading slash
+                    'USER': url.username,
+                    'PASSWORD': url.password,
+                    'HOST': url.hostname,
+                    'PORT': url.port or 5432,
+                    'OPTIONS': {
+                        'sslmode': 'require',
+                    },
+                }
+            }
+            print("Using manual database URL parsing")
+        except Exception as manual_error:
+            print(f"Manual parsing also failed: {manual_error}")
+            # Final fallback
+            DATABASES = {
+                'default': {
+                    'ENGINE': 'django.db.backends.postgresql',
+                    'NAME': 'openshelf',
+                    'USER': 'postgres',
+                    'PASSWORD': '1234',
+                    'HOST': 'localhost',
+                    'PORT': '5432'
+                }
+            }
 else:
     DATABASES = {
         'default': {
